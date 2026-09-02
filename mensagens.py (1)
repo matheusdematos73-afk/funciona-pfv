@@ -1,0 +1,49 @@
+import random
+
+saudacoes = ["oi", "olá", "ola", "oii", "oiii", "oiê", "e aí", "eai", "opa", "salve"]
+
+respostas_saudacao = ["Opa! 😎", "E aí! 👋", "Fala!", "Oi! 😄", "Olá!", "E aí, beleza?", "Opa, tudo certo?", "Fala aí! 😎", "Salve! 👋", "E aí! Como você tá?"]
+
+perguntas_chatbot = ["o que é um chatbot", "o que e um chatbot"]
+
+resposta_chatbot = "Um chatbot é um programa de computador que conversa com pessoas e responde mensagens."
+
+perguntas_funcoes = ["o que voce consegue fazer?", "oq voce consegue fazer?", "oq vc consegue fazer?", "o que vc consegue fazer?", "o que vc faz?", "oq vc faz?"]
+#memoria
+memoria = {}
+
+while True:
+    #mensagens que o bot recebe e manda.
+    mensagem = input("Você: ").lower().strip()
+
+    if any(saudacao in mensagem for saudacao in saudacoes):
+        print("Bot:", random.choice(respostas_saudacao))
+
+    elif any(pergunta in mensagem for pergunta in perguntas_chatbot):
+        print("Bot:", resposta_chatbot)
+
+    elif any(pergunta in mensagem for pergunta in perguntas_funcoes):
+        print("Bot: Eu consigo conversar, responder perguntas e realizar algumas funções básicas.")
+     #memoria basica
+    elif mensagem.startswith("meu nome é "):
+        nome = mensagem.replace("meu nome é ", "").strip()
+        memoria["nome"] = nome
+        print("Bot: Prazer, " + nome + "! Vou lembrar do seu nome.")
+
+    elif "qual é meu nome" in mensagem:
+        if "nome" in memoria:
+            print("Bot: Seu nome é " + memoria["nome"] + ".")
+        else:
+            print("Bot: Você ainda não me disse seu nome.")
+     #calculadora
+    elif any(simbolo in mensagem for simbolo in ["+", "-", "x", "÷"]):
+        try:
+                conta = mensagem.replace("x", "*").replace("÷", "/")
+                resultado = eval(conta)
+                print("Bot:", resultado)
+        except:
+        	    #erros da calculadora
+        	    print("Bot:Não conseguir calcular essa conta porque está imcompleta.")
+      #erros gerais
+    else:
+        print("Bot: Não entendi ainda, preciso aprender.")
