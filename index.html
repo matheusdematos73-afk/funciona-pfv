@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meu Chatbot</title>
+<style>
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    background: #0D0D0D;
+    color: white;
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    overflow: hidden;
+}
+.screen {
+    width: 100%;
+    height: 100vh;
+}
+#inicio {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 45px;
+}
+.titulo {
+    color: #00D9FF;
+    font-size: clamp(32px, 8vw, 52px);
+    font-weight: bold;
+}
+button {
+    border: 0;
+    cursor: pointer;
+    font-weight: bold;
+}
+#iniciar {
+    background: #00D9FF;
+    color: black;
+    font-size: 18px;
+    padding: 18px 28px;
+    border-radius: 12px;
+}
+#chat {
+    display: none;
+    flex-direction: column;
+    padding: 12px;
+}
+#area-conversa {
+    flex: 1;
+    min-height: 0;
+    background: #1A1A1A;
+    border-radius: 12px;
+    padding: 15px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    margin-bottom: 10px;
+}
+.linha {
+    margin: 0 0 14px 0;
+    line-height: 1.4;
+}
+.usuario { color: #00D9FF; }
+.bot { color: white; }
+.comando {
+    display: flex;
+    gap: 8px;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+#caixa {
+    flex: 1;
+    min-width: 0;
+    height: 58px;
+    border: none;
+    outline: none;
+    border-radius: 12px;
+    padding: 0 15px;
+    background: #303030;
+    color: white;
+    font-size: 16px;
+}
+#enviar {
+    width: 100px;
+    border-radius: 12px;
+    background: #00D9FF;
+    color: black;
+    font-size: 14px;
+}
+@media (max-width: 500px) {
+    #enviar { width: 82px; }
+    .comando { gap: 6px; }
+}
+</style>
+</head>
+<body>
+
+<section id="inicio" class="screen">
+    <div class="titulo">Meu Chatbot</div>
+    <button id="iniciar">CHATBOT - INICIAR</button>
+</section>
+
+<section id="chat" class="screen">
+    <div id="area-conversa"></div>
+    <div class="comando">
+        <input id="caixa" type="text" placeholder="Digite uma mensagem..." autocomplete="off">
+        <button id="enviar">ENVIAR</button>
+    </div>
+</section>
+
+<script>
+const inicio = document.getElementById("inicio");
+const chat = document.getElementById("chat");
+const caixa = document.getElementById("caixa");
+const enviar = document.getElementById("enviar");
+const area = document.getElementById("area-conversa");
+
+document.getElementById("iniciar").addEventListener("click", () => {
+    inicio.style.display = "none";
+    chat.style.display = "flex";
+    caixa.focus();
+});
+
+async function enviarMensagem() {
+    const texto = caixa.value.trim();
+    if (!texto) return;
+
+    adicionar("Você: " + texto, "usuario");
+    caixa.value = "";
+    enviar.disabled = true;
+
+    try {
+        const resposta = await fetch("/mensagem", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({mensagem: texto})
+        });
+
+        const dados = await resposta.json();
+        adicionar("Bot: " + dados.resposta, "bot");
+    } catch (erro) {
+        adicionar("Bot: Não consegui conectar ao servidor.", "bot");
+    } finally {
+        enviar.disabled = false;
+        caixa.focus();
+    }
+}
+
+function adicionar(texto, classe) {
+    const div = document.createElement("div");
+    div.className = "linha " + classe;
+    div.textContent = texto;
+    area.appendChild(div);
+    area.scrollTop = area.scrollHeight;
+}
+
+enviar.addEventListener("click", enviarMensagem);
+
+caixa.addEventListener("keydown", (evento) => {
+    if (evento.key === "Enter") {
+        enviarMensagem();
+    }
+});
+</script>
+</body>
+</html>
